@@ -1,0 +1,89 @@
+from turtle import *
+from numpy import *
+
+# Creen height and width
+W = 700
+H = 600
+
+# Create screen for turtles
+wn = Screen()
+wn.setup(W, H, bgcolor('black'))
+setworldcoordinates(8, H-8, W-8, 8)    # set the Screen to align with the corresponding canvas, wn.cv
+
+# register shapes
+wn.register_shape('paddle.gif')
+
+# generate turtles
+paddle = Turtle('paddle.gif')
+paddle.penup()
+paddle.speed(0)
+paddle.goto(W/2, H-40)
+
+ball = Turtle('circle')
+ball.penup()
+ball.speed(0)
+ball.goto(100, 400)
+ball.pendown()
+ball.pencolor('white')
+ball.shapesize(.75, .75, .75)
+ball.fillcolor('white')
+
+# takes the motion event from mouse movement and sends turtle to mouse position
+def followMouse(event):
+    x=event.x
+    wn.cv.unbind('<Motion>')
+    paddle.setx(x)
+
+# make ball move
+def move(angle, step):
+    # calculate x and y step sizes
+    dx=ball.xcor() + cos(angle)*step
+    dy=ball.ycor() + sin(angle)*step
+
+    ball.goto(dx, dy)
+
+# movement charactaristics
+angle=pi/3
+step=10
+frame_time=15
+
+# updates motion of ball
+def ballUpdate():
+    global angle, step, frame_time
+
+    if collisionDetect(ball) == 'paddle':
+        angle = -angle
+        move(angle, step)
+    elif collisionDetect(ball) == 'bottom':
+        angle = -angle
+    elif collisionDetect(ball) == 'top':
+        angle = -angle
+    elif collisionDetect(ball) == 'right':
+        angle = -pi - angle
+    elif collisionDetect(ball) == 'left':
+        angle = pi - angle
+
+
+    move(angle, step)
+    wn.ontimer(ballUpdate, frame_time)
+
+# check if ball is colliding with walls or paddle
+def collisionDetect(self):
+    if self.xcor() >= paddle.xcor()-20 and self.xcor() <= paddle.xcor()+20\
+            and self.ycor() >= paddle.ycor()-8 and self.ycor() <= paddle.ycor()+8:     # add some "cushioning" to paddle hitbox
+        return 'paddle'
+    elif self.xcor() >= W-8:
+        return 'right'
+    elif self.xcor() <= 4:
+        return 'left'
+    elif self.ycor() <= 4:
+        return 'top'
+    elif self.ycor() >= H-8:
+        return 'bottom'
+
+ballUpdate()
+while True:
+    wn.update()
+    wn.cv.bind('<Motion>', followMouse)
+
+wn.mainloop()
