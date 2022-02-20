@@ -1,3 +1,10 @@
+# wallBouncer.py
+# Max Kim
+# 2 Feb. 2022
+# 
+# A ball bounces off the walls and the paddle
+# Control the paddle with the mouse to bounce the ball
+
 from turtle import *
 from numpy import *
 
